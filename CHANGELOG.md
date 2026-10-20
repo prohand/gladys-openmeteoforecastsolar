@@ -4,7 +4,11 @@ All notable changes to this integration are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [semantic versioning](https://semver.org/), bumped by the Release workflow.
 
-Describe each change under `## [Unreleased]` as you make it. The Release
+Describe each change under `## [Unreleased]
+
+## [0.0.1] - 2026-10-20
+
+` as you make it. The Release
 workflow moves that section under the version it ships, and the section becomes
 the notes of the version's GitHub Release.
 
@@ -31,4 +35,5 @@ the notes of the version's GitHub Release.
 - CI (Prettier, ESLint, tests on Node 22 and 24, store checks, Docker build),
   UI-driven release workflow, GitHub Releases and Dependabot.
 
-[Unreleased]: https://github.com/prohand/gladys-openmeteoforecastsolar/commits/main
+[Unreleased]: https://github.com/prohand/gladys-openmeteoforecastsolar/compare/v0.0.1...HEAD
+[0.0.1]: https://github.com/prohand/gladys-openmeteoforecastsolar/releases/tag/v0.0.1
