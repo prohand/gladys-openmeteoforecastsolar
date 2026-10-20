@@ -1,0 +1,687 @@
+{
+  "manifest_version": 1,
+  "type": "device",
+  "name": "Open-Meteo Forecast Solar",
+  "description": {
+    "en": "Solar panel production forecast for today and tomorrow, from the free Open-Meteo API.",
+    "fr": "Prévision de production de vos panneaux solaires, aujourd'hui et demain, avec Open-Meteo.",
+    "de": "Prognose der Erzeugung deiner Solarmodule für heute und morgen, mit Open-Meteo.",
+    "es": "Previsión de producción de sus paneles solares para hoy y mañana, con Open-Meteo."
+  },
+  "version": "0.0.0",
+  "docker_image": "ghcr.io/prohand/gladys-openmeteoforecastsolar:0.0.0",
+  "gladys_version": ">=5.1.0",
+  "cover_image": "https://raw.githubusercontent.com/prohand/gladys-openmeteoforecastsolar/main/cover.png",
+  "categories": ["energy", "environment"],
+  "transports": ["cloud"],
+  "location": true,
+  "config_schema": [
+    {
+      "key": "intro",
+      "type": "section",
+      "label": {
+        "en": "Getting started",
+        "fr": "Pour commencer",
+        "de": "Erste Schritte",
+        "es": "Primeros pasos"
+      },
+      "description": {
+        "en": "Estimates what your solar panels will produce, from the free Open-Meteo weather forecast: no account, no API key. Describe your panels below. The location of your Gladys house is used unless you type other coordinates.",
+        "fr": "Estime ce que vos panneaux solaires vont produire, à partir des prévisions météo gratuites d'Open-Meteo : pas de compte, pas de clé d'API. Décrivez vos panneaux ci-dessous. La position de votre maison Gladys est utilisée, sauf si vous saisissez d'autres coordonnées.",
+        "de": "Schätzt, was deine Solarmodule erzeugen werden, anhand der kostenlosen Wettervorhersage von Open-Meteo: kein Konto, kein API-Schlüssel. Beschreibe unten deine Module. Der Standort deines Gladys-Hauses wird verwendet, außer du gibst andere Koordinaten ein.",
+        "es": "Estima lo que producirán sus paneles solares a partir de la previsión meteorológica gratuita de Open-Meteo: sin cuenta, sin clave de API. Describa sus paneles a continuación. Se usa la ubicación de su casa de Gladys, salvo que escriba otras coordenadas."
+      },
+      "links": [
+        {
+          "url": "https://open-meteo.com/en/docs",
+          "label": {
+            "en": "Open-Meteo documentation",
+            "fr": "Documentation Open-Meteo",
+            "de": "Open-Meteo-Dokumentation",
+            "es": "Documentación de Open-Meteo"
+          }
+        },
+        {
+          "url": "https://github.com/prohand/gladys-openmeteoforecastsolar/blob/main/docs/en.md",
+          "label": {
+            "en": "Integration documentation",
+            "fr": "Documentation de l'intégration",
+            "de": "Dokumentation der Integration",
+            "es": "Documentación de la integración"
+          }
+        }
+      ]
+    },
+    {
+      "key": "peak_power",
+      "type": "number",
+      "label": {
+        "en": "Peak power (kWp)",
+        "fr": "Puissance crête (kWc)",
+        "de": "Spitzenleistung (kWp)",
+        "es": "Potencia pico (kWp)"
+      },
+      "description": {
+        "en": "Total peak power of the panels, in kilowatts: the sum of the powers printed on their labels (10 panels of 400 W = 4 kWp).",
+        "fr": "Puissance crête totale des panneaux, en kilowatts : la somme des puissances inscrites sur leurs étiquettes (10 panneaux de 400 W = 4 kWc).",
+        "de": "Gesamte Spitzenleistung der Module in Kilowatt: die Summe der Leistungen auf ihren Typenschildern (10 Module mit 400 W = 4 kWp).",
+        "es": "Potencia pico total de los paneles, en kilovatios: la suma de las potencias de sus etiquetas (10 paneles de 400 W = 4 kWp)."
+      },
+      "placeholder": {
+        "en": "e.g. 3",
+        "fr": "ex. 3",
+        "de": "z. B. 3",
+        "es": "p. ej. 3"
+      },
+      "required": true,
+      "default": 3,
+      "min": 0.1,
+      "max": 1000
+    },
+    {
+      "key": "tilt",
+      "type": "number",
+      "label": {
+        "en": "Tilt (°)",
+        "fr": "Inclinaison (°)",
+        "de": "Neigung (°)",
+        "es": "Inclinación (°)"
+      },
+      "description": {
+        "en": "Angle of the panels from the horizontal: 0 = flat, 90 = vertical. A pitched roof is often between 30 and 45.",
+        "fr": "Angle des panneaux par rapport à l'horizontale : 0 = à plat, 90 = vertical. Un toit en pente est souvent entre 30 et 45.",
+        "de": "Winkel der Module zur Horizontalen: 0 = flach, 90 = senkrecht. Ein Schrägdach liegt oft zwischen 30 und 45.",
+        "es": "Ángulo de los paneles respecto a la horizontal: 0 = planos, 90 = verticales. Un tejado inclinado suele estar entre 30 y 45."
+      },
+      "placeholder": {
+        "en": "e.g. 30",
+        "fr": "ex. 30",
+        "de": "z. B. 30",
+        "es": "p. ej. 30"
+      },
+      "required": false,
+      "default": 30,
+      "min": 0,
+      "max": 90
+    },
+    {
+      "key": "azimuth",
+      "type": "number",
+      "label": {
+        "en": "Orientation (°)",
+        "fr": "Orientation (°)",
+        "de": "Ausrichtung (°)",
+        "es": "Orientación (°)"
+      },
+      "description": {
+        "en": "Direction the panels face, as on a compass: 0 = north, 90 = east, 180 = south, 270 = west.",
+        "fr": "Direction vers laquelle les panneaux sont tournés, comme sur une boussole : 0 = nord, 90 = est, 180 = sud, 270 = ouest.",
+        "de": "Richtung, in die die Module zeigen, wie auf einem Kompass: 0 = Norden, 90 = Osten, 180 = Süden, 270 = Westen.",
+        "es": "Dirección hacia la que miran los paneles, como en una brújula: 0 = norte, 90 = este, 180 = sur, 270 = oeste."
+      },
+      "placeholder": {
+        "en": "e.g. 180",
+        "fr": "ex. 180",
+        "de": "z. B. 180",
+        "es": "p. ej. 180"
+      },
+      "required": false,
+      "default": 180,
+      "min": 0,
+      "max": 359
+    },
+    {
+      "key": "system_loss",
+      "type": "number",
+      "label": {
+        "en": "System losses (%)",
+        "fr": "Pertes du système (%)",
+        "de": "Systemverluste (%)",
+        "es": "Pérdidas del sistema (%)"
+      },
+      "description": {
+        "en": "Inverter, cables, dirt and ageing. 14 % is a common value; lower it if the estimates are below your real production.",
+        "fr": "Onduleur, câbles, salissures et vieillissement. 14 % est une valeur courante ; baissez-la si les estimations sont sous votre production réelle.",
+        "de": "Wechselrichter, Kabel, Verschmutzung und Alterung. 14 % ist ein üblicher Wert; senke ihn, wenn die Schätzungen unter deiner tatsächlichen Erzeugung liegen.",
+        "es": "Inversor, cables, suciedad y envejecimiento. 14 % es un valor habitual; bájelo si las estimaciones quedan por debajo de su producción real."
+      },
+      "required": false,
+      "default": 14,
+      "min": 0,
+      "max": 50
+    },
+    {
+      "key": "power_threshold",
+      "type": "number",
+      "label": {
+        "en": "Production threshold (W)",
+        "fr": "Seuil de production (W)",
+        "de": "Erzeugungsschwelle (W)",
+        "es": "Umbral de producción (W)"
+      },
+      "description": {
+        "en": "Estimated power that fires the \"Estimated production crosses the threshold\" scene trigger, going up or down.",
+        "fr": "Puissance estimée qui déclenche le déclencheur de scène « La production estimée franchit le seuil », à la hausse ou à la baisse.",
+        "de": "Geschätzte Leistung, die den Szenen-Auslöser „Geschätzte Erzeugung überschreitet die Schwelle“ auslöst, nach oben oder unten.",
+        "es": "Potencia estimada que activa el disparador de escena «La producción estimada cruza el umbral», al subir o al bajar."
+      },
+      "placeholder": {
+        "en": "e.g. 1000",
+        "fr": "ex. 1000",
+        "de": "z. B. 1000",
+        "es": "p. ej. 1000"
+      },
+      "required": false,
+      "default": 1000,
+      "min": 0,
+      "max": 1000000
+    },
+    {
+      "key": "refresh_interval",
+      "type": "number",
+      "label": {
+        "en": "Forecast refresh (min)",
+        "fr": "Rafraîchissement (min)",
+        "de": "Aktualisierung (Min.)",
+        "es": "Actualización (min)"
+      },
+      "description": {
+        "en": "Minutes between two calls to Open-Meteo, 15 minimum. The estimated power itself is recomputed every minute.",
+        "fr": "Minutes entre deux appels à Open-Meteo, 15 minimum. La puissance estimée est, elle, recalculée chaque minute.",
+        "de": "Minuten zwischen zwei Abrufen bei Open-Meteo, mindestens 15. Die geschätzte Leistung selbst wird jede Minute neu berechnet.",
+        "es": "Minutos entre dos llamadas a Open-Meteo, 15 como mínimo. La potencia estimada se recalcula cada minuto."
+      },
+      "required": false,
+      "default": 30,
+      "min": 15,
+      "max": 180
+    },
+    {
+      "key": "other_location",
+      "type": "section",
+      "label": {
+        "en": "Other location (optional)",
+        "fr": "Autre position (facultatif)",
+        "de": "Anderer Standort (optional)",
+        "es": "Otra ubicación (opcional)"
+      },
+      "description": {
+        "en": "Leave both fields empty to use the location of your Gladys house. Fill them in for panels somewhere else.",
+        "fr": "Laissez les deux champs vides pour utiliser la position de votre maison Gladys. Remplissez-les pour des panneaux situés ailleurs.",
+        "de": "Lass beide Felder leer, um den Standort deines Gladys-Hauses zu verwenden. Fülle sie für Module an einem anderen Ort aus.",
+        "es": "Deje ambos campos vacíos para usar la ubicación de su casa de Gladys. Rellénelos para paneles situados en otro lugar."
+      }
+    },
+    {
+      "key": "latitude",
+      "type": "number",
+      "label": {
+        "en": "Latitude",
+        "fr": "Latitude",
+        "de": "Breitengrad",
+        "es": "Latitud"
+      },
+      "placeholder": {
+        "en": "e.g. 48.8566",
+        "fr": "ex. 48.8566",
+        "de": "z. B. 48.8566",
+        "es": "p. ej. 48.8566"
+      },
+      "required": false,
+      "min": -90,
+      "max": 90
+    },
+    {
+      "key": "longitude",
+      "type": "number",
+      "label": {
+        "en": "Longitude",
+        "fr": "Longitude",
+        "de": "Längengrad",
+        "es": "Longitud"
+      },
+      "placeholder": {
+        "en": "e.g. 2.3522",
+        "fr": "ex. 2.3522",
+        "de": "z. B. 2.3522",
+        "es": "p. ej. 2.3522"
+      },
+      "required": false,
+      "min": -180,
+      "max": 180
+    }
+  ],
+  "actions": [
+    {
+      "key": "test_forecast",
+      "label": {
+        "en": "Test the forecast",
+        "fr": "Tester la prévision",
+        "de": "Prognose testen",
+        "es": "Probar la previsión"
+      },
+      "description": {
+        "en": "Calls Open-Meteo now and shows the estimated production of today and tomorrow.",
+        "fr": "Appelle Open-Meteo maintenant et affiche la production estimée d'aujourd'hui et de demain.",
+        "de": "Ruft Open-Meteo jetzt ab und zeigt die geschätzte Erzeugung von heute und morgen.",
+        "es": "Llama a Open-Meteo ahora y muestra la producción estimada de hoy y de mañana."
+      },
+      "timeout_seconds": 30
+    }
+  ],
+  "scene_triggers": [
+    {
+      "key": "production_threshold",
+      "label": {
+        "en": "Estimated production crosses the threshold",
+        "fr": "La production estimée franchit le seuil",
+        "de": "Geschätzte Erzeugung überschreitet die Schwelle",
+        "es": "La producción estimada cruza el umbral"
+      },
+      "description": {
+        "en": "The estimated power goes above, or back below, the threshold set in the configuration.",
+        "fr": "La puissance estimée passe au-dessus du seuil de la configuration, ou repasse en dessous.",
+        "de": "Die geschätzte Leistung steigt über die Schwelle der Konfiguration oder fällt wieder darunter.",
+        "es": "La potencia estimada sube por encima del umbral de la configuración, o vuelve a bajar."
+      },
+      "fields": [
+        {
+          "key": "direction",
+          "type": "select",
+          "label": {
+            "en": "Direction",
+            "fr": "Sens",
+            "de": "Richtung",
+            "es": "Sentido"
+          },
+          "options": [
+            {
+              "value": "above",
+              "label": {
+                "en": "Goes above",
+                "fr": "Passe au-dessus",
+                "de": "Steigt darüber",
+                "es": "Sube por encima"
+              }
+            },
+            {
+              "value": "below",
+              "label": {
+                "en": "Goes below",
+                "fr": "Passe en dessous",
+                "de": "Fällt darunter",
+                "es": "Baja por debajo"
+              }
+            }
+          ]
+        }
+      ],
+      "variables": [
+        {
+          "key": "direction",
+          "type": "string",
+          "label": {
+            "en": "Direction (above or below)",
+            "fr": "Sens (above ou below)",
+            "de": "Richtung (above oder below)",
+            "es": "Sentido (above o below)"
+          }
+        },
+        {
+          "key": "power",
+          "type": "number",
+          "label": {
+            "en": "Estimated power (W)",
+            "fr": "Puissance estimée (W)",
+            "de": "Geschätzte Leistung (W)",
+            "es": "Potencia estimada (W)"
+          }
+        },
+        {
+          "key": "threshold",
+          "type": "number",
+          "label": {
+            "en": "Threshold (W)",
+            "fr": "Seuil (W)",
+            "de": "Schwelle (W)",
+            "es": "Umbral (W)"
+          }
+        }
+      ]
+    },
+    {
+      "key": "forecast_updated",
+      "label": {
+        "en": "Solar forecast updated",
+        "fr": "Prévision solaire mise à jour",
+        "de": "Solarprognose aktualisiert",
+        "es": "Previsión solar actualizada"
+      },
+      "description": {
+        "en": "A new forecast arrived from Open-Meteo (at each refresh of the configuration).",
+        "fr": "Une nouvelle prévision est arrivée d'Open-Meteo (à chaque rafraîchissement de la configuration).",
+        "de": "Eine neue Prognose ist von Open-Meteo eingetroffen (bei jeder Aktualisierung laut Konfiguration).",
+        "es": "Ha llegado una nueva previsión de Open-Meteo (en cada actualización de la configuración)."
+      },
+      "variables": [
+        {
+          "key": "energy_today",
+          "type": "number",
+          "label": {
+            "en": "Production today (kWh)",
+            "fr": "Production aujourd'hui (kWh)",
+            "de": "Erzeugung heute (kWh)",
+            "es": "Producción hoy (kWh)"
+          }
+        },
+        {
+          "key": "energy_remaining_today",
+          "type": "number",
+          "label": {
+            "en": "Production left today (kWh)",
+            "fr": "Production restante aujourd'hui (kWh)",
+            "de": "Verbleibende Erzeugung heute (kWh)",
+            "es": "Producción restante hoy (kWh)"
+          }
+        },
+        {
+          "key": "energy_tomorrow",
+          "type": "number",
+          "label": {
+            "en": "Production tomorrow (kWh)",
+            "fr": "Production demain (kWh)",
+            "de": "Erzeugung morgen (kWh)",
+            "es": "Producción mañana (kWh)"
+          }
+        },
+        {
+          "key": "peak_power_today",
+          "type": "number",
+          "label": {
+            "en": "Peak power today (W)",
+            "fr": "Pic de puissance aujourd'hui (W)",
+            "de": "Spitzenleistung heute (W)",
+            "es": "Potencia pico hoy (W)"
+          }
+        },
+        {
+          "key": "peak_time_today",
+          "type": "string",
+          "label": {
+            "en": "Time of the peak (HH:MM)",
+            "fr": "Heure du pic (HH:MM)",
+            "de": "Uhrzeit der Spitze (HH:MM)",
+            "es": "Hora del pico (HH:MM)"
+          }
+        }
+      ]
+    }
+  ],
+  "scene_actions": [
+    {
+      "key": "get_forecast",
+      "label": {
+        "en": "Get the solar forecast",
+        "fr": "Obtenir la prévision solaire",
+        "de": "Solarprognose abrufen",
+        "es": "Obtener la previsión solar"
+      },
+      "description": {
+        "en": "Gives the estimated power and production to the following actions.",
+        "fr": "Donne la puissance et la production estimées aux actions suivantes.",
+        "de": "Gibt die geschätzte Leistung und Erzeugung an die folgenden Aktionen weiter.",
+        "es": "Pasa la potencia y la producción estimadas a las acciones siguientes."
+      },
+      "timeout_seconds": 30,
+      "fields": [
+        {
+          "key": "refresh",
+          "type": "boolean",
+          "label": {
+            "en": "Call Open-Meteo first",
+            "fr": "Appeler Open-Meteo d'abord",
+            "de": "Zuerst Open-Meteo abrufen",
+            "es": "Llamar primero a Open-Meteo"
+          },
+          "description": {
+            "en": "Off: the forecast in memory (at most one refresh interval old) answers at once.",
+            "fr": "Désactivé : la prévision en mémoire (âgée d'un intervalle de rafraîchissement au plus) répond tout de suite.",
+            "de": "Aus: Die Prognose im Speicher (höchstens ein Aktualisierungsintervall alt) antwortet sofort.",
+            "es": "Desactivado: responde al instante la previsión en memoria (de un intervalo de actualización como máximo)."
+          },
+          "required": false,
+          "default": false
+        }
+      ],
+      "outputs": [
+        {
+          "key": "available",
+          "type": "boolean",
+          "label": {
+            "en": "Forecast available",
+            "fr": "Prévision disponible",
+            "de": "Prognose verfügbar",
+            "es": "Previsión disponible"
+          }
+        },
+        {
+          "key": "power_now",
+          "type": "number",
+          "label": {
+            "en": "Estimated power now (W)",
+            "fr": "Puissance estimée maintenant (W)",
+            "de": "Geschätzte Leistung jetzt (W)",
+            "es": "Potencia estimada ahora (W)"
+          }
+        },
+        {
+          "key": "power_next_hour",
+          "type": "number",
+          "label": {
+            "en": "Estimated power next hour (W)",
+            "fr": "Puissance estimée heure suivante (W)",
+            "de": "Geschätzte Leistung nächste Stunde (W)",
+            "es": "Potencia estimada próxima hora (W)"
+          }
+        },
+        {
+          "key": "peak_power_today",
+          "type": "number",
+          "label": {
+            "en": "Peak power today (W)",
+            "fr": "Pic de puissance aujourd'hui (W)",
+            "de": "Spitzenleistung heute (W)",
+            "es": "Potencia pico hoy (W)"
+          }
+        },
+        {
+          "key": "peak_time_today",
+          "type": "string",
+          "label": {
+            "en": "Time of the peak (HH:MM)",
+            "fr": "Heure du pic (HH:MM)",
+            "de": "Uhrzeit der Spitze (HH:MM)",
+            "es": "Hora del pico (HH:MM)"
+          }
+        },
+        {
+          "key": "energy_today",
+          "type": "number",
+          "label": {
+            "en": "Production today (kWh)",
+            "fr": "Production aujourd'hui (kWh)",
+            "de": "Erzeugung heute (kWh)",
+            "es": "Producción hoy (kWh)"
+          }
+        },
+        {
+          "key": "energy_remaining_today",
+          "type": "number",
+          "label": {
+            "en": "Production left today (kWh)",
+            "fr": "Production restante aujourd'hui (kWh)",
+            "de": "Verbleibende Erzeugung heute (kWh)",
+            "es": "Producción restante hoy (kWh)"
+          }
+        },
+        {
+          "key": "energy_tomorrow",
+          "type": "number",
+          "label": {
+            "en": "Production tomorrow (kWh)",
+            "fr": "Production demain (kWh)",
+            "de": "Erzeugung morgen (kWh)",
+            "es": "Producción mañana (kWh)"
+          }
+        }
+      ]
+    },
+    {
+      "key": "find_best_window",
+      "label": {
+        "en": "Find the sunniest time slot",
+        "fr": "Trouver le créneau le plus ensoleillé",
+        "de": "Sonnigstes Zeitfenster finden",
+        "es": "Buscar la franja más soleada"
+      },
+      "description": {
+        "en": "The time slot of a given length with the highest estimated production, to run an appliance on your own solar power.",
+        "fr": "Le créneau d'une durée donnée où la production estimée est la plus forte, pour lancer un appareil sur votre propre production.",
+        "de": "Das Zeitfenster einer bestimmten Dauer mit der höchsten geschätzten Erzeugung, um ein Gerät mit deinem eigenen Solarstrom zu betreiben.",
+        "es": "La franja de una duración dada con la mayor producción estimada, para usar un aparato con su propia energía solar."
+      },
+      "timeout_seconds": 30,
+      "fields": [
+        {
+          "key": "duration",
+          "type": "number",
+          "label": {
+            "en": "Duration (hours)",
+            "fr": "Durée (heures)",
+            "de": "Dauer (Stunden)",
+            "es": "Duración (horas)"
+          },
+          "description": {
+            "en": "Rounded to a quarter of an hour.",
+            "fr": "Arrondie au quart d'heure.",
+            "de": "Auf die Viertelstunde gerundet.",
+            "es": "Redondeada al cuarto de hora."
+          },
+          "placeholder": {
+            "en": "e.g. 2",
+            "fr": "ex. 2",
+            "de": "z. B. 2",
+            "es": "p. ej. 2"
+          },
+          "required": false,
+          "default": 2,
+          "min": 0.25,
+          "max": 12
+        },
+        {
+          "key": "day",
+          "type": "select",
+          "label": {
+            "en": "Day",
+            "fr": "Jour",
+            "de": "Tag",
+            "es": "Día"
+          },
+          "required": false,
+          "default": "today",
+          "options": [
+            {
+              "value": "today",
+              "label": {
+                "en": "Today (from now on)",
+                "fr": "Aujourd'hui (à partir de maintenant)",
+                "de": "Heute (ab jetzt)",
+                "es": "Hoy (a partir de ahora)"
+              }
+            },
+            {
+              "value": "tomorrow",
+              "label": {
+                "en": "Tomorrow",
+                "fr": "Demain",
+                "de": "Morgen",
+                "es": "Mañana"
+              }
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "key": "found",
+          "type": "boolean",
+          "label": {
+            "en": "Slot found",
+            "fr": "Créneau trouvé",
+            "de": "Zeitfenster gefunden",
+            "es": "Franja encontrada"
+          }
+        },
+        {
+          "key": "start",
+          "type": "string",
+          "label": {
+            "en": "Start (HH:MM)",
+            "fr": "Début (HH:MM)",
+            "de": "Beginn (HH:MM)",
+            "es": "Inicio (HH:MM)"
+          }
+        },
+        {
+          "key": "end",
+          "type": "string",
+          "label": {
+            "en": "End (HH:MM)",
+            "fr": "Fin (HH:MM)",
+            "de": "Ende (HH:MM)",
+            "es": "Fin (HH:MM)"
+          }
+        },
+        {
+          "key": "energy",
+          "type": "number",
+          "label": {
+            "en": "Estimated production (kWh)",
+            "fr": "Production estimée (kWh)",
+            "de": "Geschätzte Erzeugung (kWh)",
+            "es": "Producción estimada (kWh)"
+          }
+        },
+        {
+          "key": "average_power",
+          "type": "number",
+          "label": {
+            "en": "Average estimated power (W)",
+            "fr": "Puissance estimée moyenne (W)",
+            "de": "Durchschnittliche geschätzte Leistung (W)",
+            "es": "Potencia estimada media (W)"
+          }
+        }
+      ]
+    }
+  ],
+  "widgets": [
+    {
+      "key": "solar_forecast",
+      "label": {
+        "en": "Solar forecast",
+        "fr": "Prévision solaire",
+        "de": "Solarprognose",
+        "es": "Previsión solar"
+      },
+      "description": {
+        "en": "Estimated power now, production today and tomorrow, and the curve.",
+        "fr": "Puissance estimée, production d'aujourd'hui et de demain, et la courbe.",
+        "de": "Geschätzte Leistung, Erzeugung heute und morgen, und die Kurve.",
+        "es": "Potencia estimada, producción de hoy y de mañana, y la curva."
+      },
+      "icon": "sun",
+      "action_timeout_seconds": 30
+    }
+  ]
+}

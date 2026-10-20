@@ -1,0 +1,107 @@
+# Open-Meteo Forecast Solar
+
+This integration estimates what your solar panels will produce, today and tomorrow, from the
+free [Open-Meteo](https://open-meteo.com) weather forecast. No account, no API key: it works as
+soon as it is installed.
+
+It is a **cloud** integration: Gladys must reach `api.open-meteo.com` over the internet.
+It needs Gladys 5.1 or later.
+
+## Before you start
+
+The forecast is made for the **location of your house in Gladys** (**Settings → Houses**). At
+install, Gladys asks you to allow the integration to read it. If your panels are somewhere
+else, you will type their coordinates in the configuration instead.
+
+Have the description of your panels at hand:
+
+- their **peak power**: the sum of the powers printed on their labels (10 panels of 400 W =
+  4 kWp);
+- their **tilt**: 0° flat, 90° vertical, often 30° to 45° on a pitched roof;
+- their **orientation**: the direction they face, as on a compass (180° = south).
+
+## Configuration
+
+Open **Integrations → Open-Meteo Forecast Solar → Configuration**:
+
+| Field                    | What to type                                                                                      |
+| ------------------------ | ------------------------------------------------------------------------------------------------- |
+| Peak power (kWp)         | Total peak power of the panels, in kilowatts.                                                     |
+| Tilt (°)                 | 0 = flat, 90 = vertical. Default 30.                                                              |
+| Orientation (°)          | 0 = north, 90 = east, 180 = south, 270 = west. Default 180.                                       |
+| System losses (%)        | Inverter, cables, dirt, ageing. Default 14. Lower it if the estimates are below your real output. |
+| Production threshold (W) | The power used by the "Estimated production crosses the threshold" scene trigger. Default 1000 W. |
+| Forecast refresh (min)   | Minutes between two calls to Open-Meteo, 15 minimum. Default 30.                                  |
+| Latitude / Longitude     | Only for panels away from your house. Leave both empty to use the location of your Gladys house.  |
+
+Save, then click **Test the forecast**: the answer shows the estimated production of today and
+tomorrow, and the peak of the day. Then open the **Discovery** tab and add the **Solar
+forecast** device.
+
+## The device
+
+| Feature                               | Meaning                                              |
+| ------------------------------------- | ---------------------------------------------------- |
+| Estimated power now (W)               | What the panels should produce at this moment.       |
+| Estimated power next hour (W)         | The average power expected over the next 60 minutes. |
+| Estimated peak power today (W)        | The highest power of the day.                        |
+| Estimated production today (kWh)      | The whole day, from midnight to midnight.            |
+| Estimated production left today (kWh) | What is still to come today.                         |
+| Estimated production tomorrow (kWh)   | The whole of tomorrow.                               |
+
+The power is recomputed every minute; Open-Meteo is called again at the refresh interval of
+the configuration. These are **forecasts**: they are never counted as real production by the
+Gladys energy monitoring.
+
+## Scenes
+
+The integration adds its own cards to the scene editor, under the **Integrations** category.
+
+### Triggers
+
+- **Estimated production crosses the threshold** — starts the scene when the estimated power
+  goes above, or back below, the threshold of the configuration. Pick **Goes above** or **Goes
+  below** (or leave it empty for both). The scene can read `{{triggerEvent.data.power}}`
+  (estimated power, W), `{{triggerEvent.data.threshold}}` and
+  `{{triggerEvent.data.direction}}` (`above` or `below`).
+- **Solar forecast updated** — starts the scene each time a new forecast arrives (at the
+  refresh interval). Variables: `energy_today`, `energy_remaining_today`, `energy_tomorrow`
+  (kWh), `peak_power_today` (W) and `peak_time_today` (`HH:MM`).
+
+### Actions
+
+- **Get the solar forecast** — gives the current figures to the following actions: power now,
+  next hour and peak (W), production today, left today and tomorrow (kWh), time of the peak.
+  Turn on **Call Open-Meteo first** to fetch a fresh forecast before answering. `available` is
+  false when there is no forecast yet.
+- **Find the sunniest time slot** — finds the window of a given duration (rounded to the
+  quarter of an hour) with the highest estimated production, **today** (from now on) or
+  **tomorrow**. Outputs: `found`, `start` and `end` (`HH:MM`), `energy` (kWh) and
+  `average_power` (W).
+
+Example: every evening at 21:00, run **Find the sunniest time slot** (3 hours, tomorrow), then
+send yourself a message "Run the dishwasher tomorrow between {{0.0.start}} and {{0.0.end}}".
+
+## Dashboard
+
+Edit a dashboard, add the **Solar forecast** widget. It shows the estimated power now and the
+production of today and tomorrow (live), the production curve of both days with the peak, what
+is left today, your installation, its location and the time of the last update. The
+**Refresh** button calls Open-Meteo at once.
+
+## Troubleshooting
+
+- **"No location"**: set the location of your house in **Settings → Houses**, or type a
+  latitude and a longitude in the configuration.
+- **"Open-Meteo could not be reached"**: Gladys has no internet access, or Open-Meteo is down.
+  The last forecast stays displayed (orange dot on the device badge) and the integration tries
+  again every 5 minutes.
+- **The estimates are always too high or too low**: adjust the **System losses**. Shading and
+  snow are not taken into account.
+- The integration logs are in **Settings → Integrations → Open-Meteo Forecast Solar → Logs**.
+
+## Credits
+
+Weather data by [Open-Meteo.com](https://open-meteo.com/), under
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). The free Open-Meteo API is for
+non-commercial use.
