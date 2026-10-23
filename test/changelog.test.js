@@ -14,9 +14,15 @@ const REPO = 'https://github.com/prohand/gladys-openmeteoforecastsolar';
 test('the real changelog has an Unreleased section the release can roll', async () => {
   const text = await readFile(changelogPath, 'utf8');
   assert.match(text, /^## \[Unreleased\]$/m);
-  const rolled = rollChangelog(text, '1.0.0', '2026-10-20');
-  assert.match(rolled, /^## \[1\.0\.0\] - 2026-10-20$/m);
-  assert.match(rolled, new RegExp(`^\\[1\\.0\\.0\\]: ${REPO}/releases/tag/v1\\.0\\.0$`, 'm'));
+  const { version: current } = JSON.parse(
+    await readFile(fileURLToPath(new URL('../package.json', import.meta.url)), 'utf8'),
+  );
+  const rolled = rollChangelog(text, '9.9.9', '2026-10-20');
+  assert.match(rolled, /^## \[Unreleased\]\n\n## \[9\.9\.9\] - 2026-10-20$/m);
+  assert.ok(
+    rolled.includes(`[9.9.9]: ${REPO}/compare/v${current}...v9.9.9`),
+    'the release compares with the last tag',
+  );
   const options = { ...(await prettier.resolveConfig(changelogPath)), filepath: changelogPath };
   assert.equal(await prettier.format(rolled, options), rolled, 'the release commit stays clean');
 });
