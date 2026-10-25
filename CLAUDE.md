@@ -13,7 +13,7 @@ JavaScript template (`GladysAssistant/integration-template-js`); its workflows f
 
 One device ("Solar forecast") with read-only features, two scene triggers, two scene actions,
 one dashboard widget and one Configuration-screen action. Cloud only (manifest
-`"transports": ["cloud"]`). Gladys 5.1+.
+`"transports": ["cloud"]`). Gladys 5.3+ (catalog `keywords`; the `house` select needs 5.2).
 
 ## Commands
 
@@ -85,6 +85,10 @@ test/                       node --test, against the SDK's fake Gladys + a fake 
   manifest action: a scene bound to it could loop.
 - **Scene actions are never conditions**: "no forecast" is an output (`available: false`,
   `found: false`), not a thrown error.
+- **The house**: the `house` select (`source: "houses"`) stores a house selector; empty means
+  the first located house. A picked house that is gone or not on the map is reported
+  (`pickedHouseProblem`), never replaced by another one: the forecast would describe the wrong
+  roof. Typed coordinates win over both.
 - **Location is personal data**: the coordinates are never logged above `debug`.
 - **Transport badge**: `cloud` when the last call worked, `cloud` + `degraded` while an older
   forecast is shown, `unreachable` when there is none.
@@ -104,7 +108,9 @@ test/                       node --test, against the SDK's fake Gladys + a fake 
   kept in sync. `test/manifest.test.js` and `test/widget.test.js` check the four keys.
 - **Manifest.** `test/manifest.test.js` ties it to the code (defaults, actions, scene actions,
   triggers, widget): change both sides together. The catalog `description` holds 10 to 100
-  characters per language; widget labels 3 to 30.
+  characters per language; widget labels 3 to 30. `keywords` (1-10, 2-30 characters) need
+  `gladys_version >=5.3.0`, `source: "houses"` 5.2.0; `categories` come from the store
+  vocabulary; no `countries` (Open-Meteo is worldwide).
 - **Style.** Prettier formats, ESLint catches mistakes. Comments explain why, in English.
   Tests never touch the network (fake Open-Meteo in `test/helpers/fakeOpenMeteo.js`, clock
   passed in as `now`).

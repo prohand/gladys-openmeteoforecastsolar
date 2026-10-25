@@ -5,13 +5,15 @@ free [Open-Meteo](https://open-meteo.com) weather forecast. No account, no API k
 soon as it is installed.
 
 It is a **cloud** integration: Gladys must reach `api.open-meteo.com` over the internet.
-It needs Gladys 5.1 or later.
+It needs Gladys 5.3.0 or later.
 
 ## Before you start
 
 The forecast is made for the **location of your house in Gladys** (**Settings → Houses**). At
 install, Gladys asks you to allow the integration to read it. If your panels are somewhere
-else, you will type their coordinates in the configuration instead.
+else, you will type their coordinates in the configuration instead. With several houses, pick
+the one with the panels in the **House** field; left empty, the first house placed on the map
+is used.
 
 Have the description of your panels at hand:
 
@@ -32,6 +34,7 @@ Open **Integrations → Open-Meteo Forecast Solar → Configuration**:
 | System losses (%)        | Inverter, cables, dirt, ageing. Default 14. Lower it if the estimates are below your real output. |
 | Production threshold (W) | The power used by the "Estimated production crosses the threshold" scene trigger. Default 1000 W. |
 | Forecast refresh (min)   | Minutes between two calls to Open-Meteo, 15 minimum. Default 30.                                  |
+| House                    | The Gladys house where the panels are. Empty: the first house placed on the map.                  |
 | Latitude / Longitude     | Only for panels away from your house. Leave both empty to use the location of your Gladys house.  |
 
 Save, then click **Test the forecast**: the answer shows the estimated production of today and
@@ -92,7 +95,9 @@ is left today, your installation, its location and the time of the last update. 
 ## Troubleshooting
 
 - **"No location"**: set the location of your house in **Settings → Houses**, or type a
-  latitude and a longitude in the configuration.
+  latitude and a longitude in the configuration. When the house picked in the **House** field
+  was deleted or is not placed on the map, the message names it: pick another house or place
+  it on the map.
 - **"Open-Meteo could not be reached"**: Gladys has no internet access, or Open-Meteo is down.
   The last forecast stays displayed (orange dot on the device badge) and the integration tries
   again every 5 minutes.

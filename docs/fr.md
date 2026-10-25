@@ -5,13 +5,15 @@ partir des prévisions météo gratuites d'[Open-Meteo](https://open-meteo.com).
 pas de clé d'API : elle fonctionne dès l'installation.
 
 C'est une intégration **cloud** : Gladys doit pouvoir joindre `api.open-meteo.com` par
-internet. Elle demande Gladys 5.1 ou plus récent.
+internet. Elle demande Gladys 5.3.0 ou plus récent.
 
 ## Avant de commencer
 
 La prévision est faite pour la **position de votre maison dans Gladys** (**Paramètres →
 Maisons**). À l'installation, Gladys vous demande d'autoriser l'intégration à la lire. Si vos
-panneaux sont ailleurs, vous saisirez leurs coordonnées dans la configuration.
+panneaux sont ailleurs, vous saisirez leurs coordonnées dans la configuration. Avec plusieurs
+maisons, choisissez celle qui porte les panneaux dans le champ **Maison** ; laissé vide, c'est
+la première maison placée sur la carte qui est utilisée.
 
 Ayez sous la main la description de vos panneaux :
 
@@ -33,6 +35,7 @@ Ouvrez **Intégrations → Open-Meteo Forecast Solar → Configuration** :
 | Pertes du système (%)   | Onduleur, câbles, salissures, vieillissement. 14 par défaut. Baissez-la si les estimations sont trop basses.            |
 | Seuil de production (W) | La puissance utilisée par le déclencheur « La production estimée franchit le seuil ». 1000 W par défaut.                |
 | Rafraîchissement (min)  | Minutes entre deux appels à Open-Meteo, 15 minimum. 30 par défaut.                                                      |
+| Maison                  | La maison Gladys où se trouvent les panneaux. Vide : la première maison placée sur la carte.                            |
 | Latitude / Longitude    | Seulement pour des panneaux loin de la maison. Laissez les deux vides pour utiliser la position de votre maison Gladys. |
 
 Enregistrez, puis cliquez sur **Tester la prévision** : la réponse donne la production estimée
@@ -97,7 +100,9 @@ tout de suite.
 ## En cas de problème
 
 - **« Aucune position »** : renseignez la position de votre maison dans **Paramètres →
-  Maisons**, ou saisissez une latitude et une longitude dans la configuration.
+  Maisons**, ou saisissez une latitude et une longitude dans la configuration. Quand la maison
+  choisie dans le champ **Maison** a été supprimée ou n'est pas placée sur la carte, le message
+  le dit : choisissez une autre maison ou placez-la sur la carte.
 - **« Open-Meteo n'a pas pu être joint »** : Gladys n'a pas accès à internet, ou Open-Meteo est
   en panne. La dernière prévision reste affichée (point orange sur le badge de l'appareil) et
   l'intégration réessaie toutes les 5 minutes.

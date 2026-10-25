@@ -63,6 +63,15 @@ test('without a forecast, the widget says why and offers to retry', async () => 
   assert.deepEqual(validateWidgetContent(noLocation), []);
   assert.match(noLocation.components[0].text.en, /location of your house/);
 
+  const unlocated = createHarness({
+    config: { house: 'flat' },
+    houses: [{ id: 'f', name: 'Flat', selector: 'flat', latitude: null, longitude: null }],
+  });
+  await unlocated.gladys.connect();
+  const pickedHouse = await contentOf(unlocated);
+  assert.deepEqual(validateWidgetContent(pickedHouse), []);
+  assert.match(pickedHouse.components[0].text.en, /"Flat" is not placed on the map/);
+
   const offline = createHarness();
   offline.state.online = false;
   await offline.gladys.connect();

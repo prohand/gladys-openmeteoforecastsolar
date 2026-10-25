@@ -10,6 +10,19 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+### Added
+
+- **House** field: with several Gladys houses, pick the one where the panels are (empty: the
+  first house placed on the map, as before). A picked house that was deleted or is not on the
+  map is reported, never replaced by another one.
+- Search keywords in the store catalog (photovoltaic, kWp, irradiance…).
+
+### Changed
+
+- Requires Gladys 5.3.0 or later (catalog keywords, house picker).
+- Gladys integration SDK 0.16.
+- The release workflow runs the full store admission check once the image is published.
+
 ## [0.0.2] - 2026-10-23
 
 - Maintenance release, no functional change.

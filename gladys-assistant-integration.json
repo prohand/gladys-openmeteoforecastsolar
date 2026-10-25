@@ -10,9 +10,20 @@
   },
   "version": "0.0.2",
   "docker_image": "ghcr.io/prohand/gladys-openmeteoforecastsolar:0.0.2",
-  "gladys_version": ">=5.1.0",
+  "gladys_version": ">=5.3.0",
   "cover_image": "https://raw.githubusercontent.com/prohand/gladys-openmeteoforecastsolar/main/cover.png",
   "categories": ["energy", "environment"],
+  "keywords": [
+    "photovoltaic",
+    "photovoltaïque",
+    "photovoltaik",
+    "fotovoltaica",
+    "pv forecast",
+    "solar irradiance",
+    "kwp",
+    "pv yield",
+    "solar radiation"
+  ],
   "transports": ["cloud"],
   "location": true,
   "config_schema": [
@@ -26,10 +37,10 @@
         "es": "Primeros pasos"
       },
       "description": {
-        "en": "Estimates what your solar panels will produce, from the free Open-Meteo weather forecast: no account, no API key. Describe your panels below. The location of your Gladys house is used unless you type other coordinates.",
-        "fr": "Estime ce que vos panneaux solaires vont produire, à partir des prévisions météo gratuites d'Open-Meteo : pas de compte, pas de clé d'API. Décrivez vos panneaux ci-dessous. La position de votre maison Gladys est utilisée, sauf si vous saisissez d'autres coordonnées.",
-        "de": "Schätzt, was deine Solarmodule erzeugen werden, anhand der kostenlosen Wettervorhersage von Open-Meteo: kein Konto, kein API-Schlüssel. Beschreibe unten deine Module. Der Standort deines Gladys-Hauses wird verwendet, außer du gibst andere Koordinaten ein.",
-        "es": "Estima lo que producirán sus paneles solares a partir de la previsión meteorológica gratuita de Open-Meteo: sin cuenta, sin clave de API. Describa sus paneles a continuación. Se usa la ubicación de su casa de Gladys, salvo que escriba otras coordenadas."
+        "en": "Estimates what your solar panels will produce, from the free Open-Meteo weather forecast: no account, no API key. Describe your panels below. The location of your Gladys house (the one picked below, or the first one placed on the map) is used unless you type other coordinates.",
+        "fr": "Estime ce que vos panneaux solaires vont produire, à partir des prévisions météo gratuites d'Open-Meteo : pas de compte, pas de clé d'API. Décrivez vos panneaux ci-dessous. La position de votre maison Gladys (celle choisie ci-dessous, ou la première placée sur la carte) est utilisée, sauf si vous saisissez d'autres coordonnées.",
+        "de": "Schätzt, was deine Solarmodule erzeugen werden, anhand der kostenlosen Wettervorhersage von Open-Meteo: kein Konto, kein API-Schlüssel. Beschreibe unten deine Module. Der Standort deines Gladys-Hauses (des unten gewählten oder des ersten auf der Karte platzierten) wird verwendet, außer du gibst andere Koordinaten ein.",
+        "es": "Estima lo que producirán sus paneles solares a partir de la previsión meteorológica gratuita de Open-Meteo: sin cuenta, sin clave de API. Describa sus paneles a continuación. Se usa la ubicación de su casa de Gladys (la elegida a continuación, o la primera situada en el mapa), salvo que escriba otras coordenadas."
       },
       "links": [
         {
@@ -195,6 +206,24 @@
       "default": 30,
       "min": 15,
       "max": 180
+    },
+    {
+      "key": "house",
+      "type": "select",
+      "source": "houses",
+      "label": {
+        "en": "House",
+        "fr": "Maison",
+        "de": "Haus",
+        "es": "Casa"
+      },
+      "description": {
+        "en": "The Gladys house where the panels are. Empty: the first house placed on the map in Gladys.",
+        "fr": "La maison Gladys où se trouvent les panneaux. Vide : la première maison placée sur la carte dans Gladys.",
+        "de": "Das Gladys-Haus, an dem die Module sind. Leer: das erste in Gladys auf der Karte platzierte Haus.",
+        "es": "La casa de Gladys donde están los paneles. Vacío: la primera casa situada en el mapa en Gladys."
+      },
+      "required": false
     },
     {
       "key": "other_location",

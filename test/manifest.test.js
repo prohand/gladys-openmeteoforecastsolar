@@ -38,6 +38,29 @@ const keysOf = (list) => (list ?? []).map((entry) => entry.key);
 // `gladys_version` minimum is lower: these tests catch it before a release.
 const CAPABILITY_MIN_GLADYS_VERSION = [5, 1, 0];
 const CATEGORIES_MIN_GLADYS_VERSION = [4, 86, 0];
+const HOUSES_SOURCE_MIN_GLADYS_VERSION = [5, 2, 0];
+const CATALOG_SEARCH_MIN_GLADYS_VERSION = [5, 3, 0];
+
+// The store's catalog shelves (Gladys 5.3 added transport, vehicles, servers and leisure).
+// An unknown key is only dropped with a warning, so a typo would silently cost the shelf.
+const CATALOG_CATEGORIES = [
+  'climate',
+  'lighting',
+  'energy',
+  'security',
+  'multimedia',
+  'appliances',
+  'environment',
+  'protocols',
+  'network',
+  'notifications',
+  'assistants',
+  'services',
+  'transport',
+  'vehicles',
+  'servers',
+  'leisure',
+];
 
 function minGladysVersion() {
   const match = manifest.gladys_version.match(/>=\s*(\d+)\.(\d+)\.(\d+)/);
@@ -107,7 +130,43 @@ test('every manifest action has a handler', async () => {
 
 test('declaring catalog categories requires Gladys >= 4.86.0', () => {
   assert.ok(manifest.categories.length >= 1 && manifest.categories.length <= 3);
+  assert.equal(new Set(manifest.categories).size, manifest.categories.length);
+  for (const category of manifest.categories) {
+    assert.ok(CATALOG_CATEGORIES.includes(category), `unknown catalog category "${category}"`);
+  }
   assert.ok(isAtLeast(minGladysVersion(), CATEGORIES_MIN_GLADYS_VERSION));
+});
+
+test('declaring keywords, countries or music requires Gladys >= 5.3.0', () => {
+  if (manifest.keywords || manifest.countries || manifest.music) {
+    assert.ok(
+      isAtLeast(minGladysVersion(), CATALOG_SEARCH_MIN_GLADYS_VERSION),
+      `keywords / countries / music require gladys_version >= 5.3.0, got "${manifest.gladys_version}"`,
+    );
+  }
+});
+
+test('keywords are 1 to 10 unique search terms of 2 to 30 characters', () => {
+  assert.ok(Array.isArray(manifest.keywords));
+  assert.ok(manifest.keywords.length >= 1 && manifest.keywords.length <= 10);
+  const normalized = manifest.keywords.map((keyword) => keyword.trim().toLowerCase());
+  assert.equal(new Set(normalized).size, normalized.length, 'keywords must be unique');
+  for (const keyword of normalized) {
+    assert.ok(keyword.length >= 2 && keyword.length <= 30, `keyword "${keyword}"`);
+  }
+});
+
+test('no countries: Open-Meteo forecasts the whole world', () => {
+  assert.equal(manifest.countries, undefined);
+});
+
+test('the house select lists the Gladys houses (Gladys >= 5.2.0), with no default', () => {
+  const house = manifest.config_schema.find((field) => field.key === 'house');
+  assert.equal(house.type, 'select');
+  assert.equal(house.source, 'houses');
+  assert.equal(house.default, undefined, 'the store refuses a default on a dynamic source');
+  assert.notEqual(house.required, true, 'empty means the first located house');
+  assert.ok(isAtLeast(minGladysVersion(), HOUSES_SOURCE_MIN_GLADYS_VERSION));
 });
 
 test('declaring scene triggers, scene actions or widgets requires Gladys >= 5.1.0', () => {
