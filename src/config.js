@@ -26,6 +26,9 @@ export const DEFAULT_CONFIG = {
   // Minutes between two calls to Open-Meteo. Its models are updated every
   // hour at best: a faster pace brings nothing.
   refresh_interval: 30,
+  // The Gladys house the panels sit at: the `selector` the `source: "houses"`
+  // select stores (Gladys 5.2+). Empty means the first located house.
+  house: '',
   // Coordinates to observe. Empty (null) means the location of the Gladys
   // house (see src/location.js): the user only types them to override it.
   latitude: null,
@@ -81,6 +84,7 @@ export function normalizeConfig(raw = {}) {
       1_000_000,
     ),
     refresh_interval: boundedNumber(raw.refresh_interval, DEFAULT_CONFIG.refresh_interval, 15, 180),
+    house: typeof raw.house === 'string' ? raw.house.trim() : '',
     latitude: located ? latitude : null,
     longitude: located ? longitude : null,
   };

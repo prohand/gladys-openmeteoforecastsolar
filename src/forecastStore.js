@@ -11,7 +11,7 @@
 
 import { createLogger } from '@gladysassistant/integration-sdk';
 import { fetchIrradiance } from './openMeteo.js';
-import { resolveSite } from './location.js';
+import { LOCATION_PROBLEMS, resolveSite } from './location.js';
 import { buildForecast } from './solar.js';
 
 const logger = createLogger({ name: 'forecast' });
@@ -21,9 +21,22 @@ export const RETRY_DELAY_MS = 5 * 60 * 1000;
 
 /** Raised when nothing locates the panels: the user has something to fill in. */
 export class MissingLocationError extends Error {
-  constructor() {
-    super('No location: set the location of your house in Gladys, or type coordinates');
+  /**
+   * @param {{ problem?: string, house?: string|null }} [detail] set when the
+   *   house picked in the configuration locates nothing (LOCATION_PROBLEMS)
+   */
+  constructor({ problem = null, house = null } = {}) {
+    const reasons = {
+      [LOCATION_PROBLEMS.HOUSE_NOT_FOUND]: 'the house picked in the configuration no longer exists',
+      [LOCATION_PROBLEMS.HOUSE_UNLOCATED]:
+        'the house picked in the configuration is not on the map',
+    };
+    super(
+      `No location: ${reasons[problem] ?? 'set the location of your house in Gladys, or type coordinates'}`,
+    );
     this.name = 'MissingLocationError';
+    this.problem = problem;
+    this.house = house;
   }
 }
 
@@ -50,6 +63,7 @@ export function createForecastStore({
       config.tilt,
       config.azimuth,
       config.system_loss,
+      config.house,
       config.latitude,
       config.longitude,
     ]);
@@ -58,8 +72,8 @@ export function createForecastStore({
     lastAttemptAt = now();
     try {
       const site = await resolveSite(gladys, config);
-      if (!site) {
-        throw new MissingLocationError();
+      if (!site || site.problem) {
+        throw new MissingLocationError(site ?? {});
       }
       const irradiance = await fetchPlane({ ...site, tilt: config.tilt, azimuth: config.azimuth });
       forecast = buildForecast(irradiance, config, site, now());

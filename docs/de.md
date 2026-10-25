@@ -5,13 +5,15 @@ kostenlosen Wettervorhersage von [Open-Meteo](https://open-meteo.com). Kein Kont
 API-Schlüssel: Sie funktioniert direkt nach der Installation.
 
 Es ist eine **Cloud**-Integration: Gladys muss `api.open-meteo.com` über das Internet
-erreichen. Sie braucht Gladys 5.1 oder neuer.
+erreichen. Sie braucht Gladys 5.3.0 oder neuer.
 
 ## Bevor du anfängst
 
 Die Prognose gilt für den **Standort deines Hauses in Gladys** (**Einstellungen → Häuser**).
 Bei der Installation fragt Gladys, ob die Integration ihn lesen darf. Stehen deine Module
-woanders, gibst du stattdessen ihre Koordinaten in der Konfiguration ein.
+woanders, gibst du stattdessen ihre Koordinaten in der Konfiguration ein. Hast du mehrere
+Häuser, wähle im Feld **Haus** das mit den Modulen; bleibt es leer, wird das erste auf der
+Karte platzierte Haus verwendet.
 
 Halte die Beschreibung deiner Module bereit:
 
@@ -32,6 +34,7 @@ Halte die Beschreibung deiner Module bereit:
 | Systemverluste (%)       | Wechselrichter, Kabel, Verschmutzung, Alterung. Standard 14. Senke den Wert, wenn die Schätzungen zu niedrig sind. |
 | Erzeugungsschwelle (W)   | Die Leistung für den Auslöser „Geschätzte Erzeugung überschreitet die Schwelle“. Standard 1000 W.                  |
 | Aktualisierung (Min.)    | Minuten zwischen zwei Abrufen bei Open-Meteo, mindestens 15. Standard 30.                                          |
+| Haus                     | Das Gladys-Haus, an dem die Module sind. Leer: das erste auf der Karte platzierte Haus.                            |
 | Breitengrad / Längengrad | Nur für Module abseits deines Hauses. Lass beide leer, um den Standort deines Gladys-Hauses zu verwenden.          |
 
 Speichere und klicke dann auf **Prognose testen**: Die Antwort zeigt die geschätzte Erzeugung
@@ -95,7 +98,9 @@ Aktualisierung. Der Button **Aktualisieren** ruft Open-Meteo sofort ab.
 ## Fehlerbehebung
 
 - **„Kein Standort“**: Lege den Standort deines Hauses unter **Einstellungen → Häuser** fest
-  oder gib Breiten- und Längengrad in der Konfiguration ein.
+  oder gib Breiten- und Längengrad in der Konfiguration ein. Wurde das im Feld **Haus** gewählte
+  Haus gelöscht oder ist es nicht auf der Karte platziert, sagt die Meldung das: Wähle ein
+  anderes Haus oder platziere es auf der Karte.
 - **„Open-Meteo war nicht erreichbar“**: Gladys hat keinen Internetzugang oder Open-Meteo ist
   gestört. Die letzte Prognose bleibt angezeigt (oranger Punkt am Badge des Geräts), und die
   Integration versucht es alle 5 Minuten erneut.

@@ -18,7 +18,7 @@ import { createLogger, DEVICE_TRANSPORTS } from '@gladysassistant/integration-sd
 import { normalizeConfig } from './config.js';
 import { buildDevice, buildStates, deviceIds } from './device.js';
 import { createForecastStore, MissingLocationError } from './forecastStore.js';
-import { describeCoordinates } from './location.js';
+import { describeCoordinates, pickedHouseProblem } from './location.js';
 import { formatKwh, formatWatts } from './format.js';
 import { localize, pick } from './i18n.js';
 import { localTime, summarize } from './solar.js';
@@ -45,7 +45,7 @@ const NO_LOCATION = {
 /** Why Open-Meteo failed, as the user reads it. */
 function describeFailure(err) {
   if (err instanceof MissingLocationError) {
-    return NO_LOCATION;
+    return pickedHouseProblem(err) ?? NO_LOCATION;
   }
   return {
     en: `Open-Meteo could not be reached (${err.message}).`,

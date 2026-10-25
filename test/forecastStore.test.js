@@ -4,7 +4,7 @@ import { createFakeGladys } from '@gladysassistant/integration-sdk/testing';
 import { createForecastStore, MissingLocationError, RETRY_DELAY_MS } from '../src/forecastStore.js';
 import { parseForecast } from '../src/openMeteo.js';
 import { normalizeConfig } from '../src/config.js';
-import { resolveSite } from '../src/location.js';
+import { LOCATION_PROBLEMS, resolveSite } from '../src/location.js';
 import { at, openMeteoBody } from './helpers/fakeOpenMeteo.js';
 
 const HOUSES = [
@@ -45,6 +45,53 @@ test('typed coordinates win over the house', async () => {
   const config = normalizeConfig({ latitude: 43.6, longitude: 1.44 });
   const site = await resolveSite(createFakeGladys({ houses: HOUSES }), config);
   assert.deepEqual(site, { latitude: 43.6, longitude: 1.44, label: null });
+});
+
+const TWO_HOUSES = [
+  { id: 'h1', name: 'Home', selector: 'home', latitude: 48.86, longitude: 2.34 },
+  { id: 'h2', name: 'Barn', selector: 'barn', latitude: 45.76, longitude: 4.83 },
+  { id: 'h3', name: 'Flat', selector: 'flat', latitude: null, longitude: null },
+];
+
+test('the house picked in the configuration locates the panels', async () => {
+  const site = await resolveSite(
+    createFakeGladys({ houses: TWO_HOUSES }),
+    normalizeConfig({ house: 'barn' }),
+  );
+  assert.deepEqual(site, { latitude: 45.76, longitude: 4.83, label: 'Barn' });
+});
+
+test('a picked house that is gone or not on the map is reported, never replaced', async () => {
+  const gladys = createFakeGladys({ houses: TWO_HOUSES });
+  assert.deepEqual(await resolveSite(gladys, normalizeConfig({ house: 'deleted' })), {
+    problem: LOCATION_PROBLEMS.HOUSE_NOT_FOUND,
+    house: null,
+  });
+  assert.deepEqual(await resolveSite(gladys, normalizeConfig({ house: 'flat' })), {
+    problem: LOCATION_PROBLEMS.HOUSE_UNLOCATED,
+    house: 'Flat',
+  });
+});
+
+test('typed coordinates win over the picked house', async () => {
+  const config = normalizeConfig({ house: 'barn', latitude: 43.6, longitude: 1.44 });
+  const site = await resolveSite(createFakeGladys({ houses: TWO_HOUSES }), config);
+  assert.deepEqual(site, { latitude: 43.6, longitude: 1.44, label: null });
+});
+
+test('a picked house that locates nothing does not call Open-Meteo', async () => {
+  const { gladys, store, calls } = setup({ houses: TWO_HOUSES });
+  const err = await store.refresh(gladys, normalizeConfig({ house: 'flat' })).catch((e) => e);
+  assert.ok(err instanceof MissingLocationError);
+  assert.equal(err.problem, LOCATION_PROBLEMS.HOUSE_UNLOCATED);
+  assert.equal(calls.length, 0);
+});
+
+test('picking another house makes the forecast stale at once', async () => {
+  const { gladys, store } = setup({ houses: TWO_HOUSES });
+  await store.refresh(gladys, normalizeConfig());
+  assert.equal(store.isDue(normalizeConfig()), false);
+  assert.equal(store.isDue(normalizeConfig({ house: 'barn' })), true);
 });
 
 test('no located house and no coordinates: nothing to forecast', async () => {

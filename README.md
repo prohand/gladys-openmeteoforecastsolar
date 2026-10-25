@@ -4,7 +4,7 @@ An external integration for [Gladys Assistant](https://gladysassistant.com) that
 production of your solar panels, from the free [Open-Meteo](https://open-meteo.com) weather
 API: no account, no API key.
 
-- **Cloud** integration (Open-Meteo is reached over the internet), Gladys **5.1.0** or later.
+- **Cloud** integration (Open-Meteo is reached over the internet), Gladys **5.3.0** or later.
 - Languages: English, French, German, Spanish.
 - User documentation: [English](docs/en.md) · [Français](docs/fr.md) ·
   [Deutsch](docs/de.md) · [Español](docs/es.md).
@@ -37,7 +37,8 @@ hotter than the air the more sun they get, and lose about 0.4 % of power per deg
 weather forecast. Adjust the system losses if your real production differs.
 
 The location of your Gladys house is used by default (the integration asks for it at
-install, manifest `"location": true`). Coordinates typed in the configuration override it.
+install, manifest `"location": true`): the one picked in the **House** field (`source:
+"houses"`), or the first located one. Coordinates typed in the configuration override it.
 
 ## Project structure
 
@@ -50,7 +51,7 @@ install, manifest `"location": true`). Coordinates typed in the configuration ov
 │  ├─ openMeteo.js                   # the Open-Meteo call
 │  ├─ solar.js                       # PV model, daily figures, best window (pure)
 │  ├─ forecastStore.js               # forecast in memory + refresh policy
-│  ├─ location.js                    # Gladys house or typed coordinates
+│  ├─ location.js                    # picked Gladys house, first located one, or typed coordinates
 │  ├─ device.js                      # the device and its states
 │  ├─ format.js / i18n.js            # numbers and texts in four languages
 │  └─ capabilities/                  # scene triggers, scene actions, widget (Gladys 5.1+)
@@ -102,7 +103,8 @@ npx github:GladysAssistant/integration-store --skip-image-check .
 
 The workflow bumps the version everywhere, rolls the changelog, tags `vX.Y.Z`, builds the
 `linux/amd64` + `linux/arm64` image to `ghcr.io/prohand/gladys-openmeteoforecastsolar`
-(`:X.Y.Z` and `:latest`) and publishes the GitHub Release. The store indexer picks up the new
+(`:X.Y.Z` and `:latest`), runs the full store admission checks against that image and
+publishes the GitHub Release. The store indexer picks up the new
 manifest version and Gladys offers the update.
 
 The repository needs the GitHub topic `gladys-assistant-integration`, a public `ghcr.io`

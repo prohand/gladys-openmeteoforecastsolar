@@ -5,13 +5,14 @@ previsión meteorológica gratuita de [Open-Meteo](https://open-meteo.com). Sin 
 de API: funciona en cuanto se instala.
 
 Es una integración **cloud**: Gladys debe poder acceder a `api.open-meteo.com` por internet.
-Necesita Gladys 5.1 o posterior.
+Necesita Gladys 5.3.0 o posterior.
 
 ## Antes de empezar
 
 La previsión se hace para la **ubicación de su casa en Gladys** (**Ajustes → Casas**). Al
 instalarla, Gladys le pide que autorice a la integración a leerla. Si sus paneles están en
-otro lugar, escribirá sus coordenadas en la configuración.
+otro lugar, escribirá sus coordenadas en la configuración. Con varias casas, elija la de los
+paneles en el campo **Casa**; si lo deja vacío, se usa la primera casa situada en el mapa.
 
 Tenga a mano la descripción de sus paneles:
 
@@ -32,6 +33,7 @@ Abra **Integraciones → Open-Meteo Forecast Solar → Configuración**:
 | Pérdidas del sistema (%) | Inversor, cables, suciedad, envejecimiento. 14 por defecto. Bájelo si las estimaciones son demasiado bajas. |
 | Umbral de producción (W) | La potencia que usa el disparador «La producción estimada cruza el umbral». 1000 W por defecto.             |
 | Actualización (min)      | Minutos entre dos llamadas a Open-Meteo, 15 como mínimo. 30 por defecto.                                    |
+| Casa                     | La casa de Gladys donde están los paneles. Vacío: la primera casa situada en el mapa.                       |
 | Latitud / Longitud       | Solo para paneles lejos de su casa. Deje ambos vacíos para usar la ubicación de su casa de Gladys.          |
 
 Guarde y haga clic en **Probar la previsión**: la respuesta muestra la producción estimada de
@@ -93,7 +95,9 @@ botón **Actualizar** llama a Open-Meteo al instante.
 ## Solución de problemas
 
 - **«Sin ubicación»**: indique la ubicación de su casa en **Ajustes → Casas**, o escriba una
-  latitud y una longitud en la configuración.
+  latitud y una longitud en la configuración. Si la casa elegida en el campo **Casa** se ha
+  eliminado o no está situada en el mapa, el mensaje lo indica: elija otra casa o sitúela en el
+  mapa.
 - **«No se pudo contactar con Open-Meteo»**: Gladys no tiene acceso a internet, u Open-Meteo no
   funciona. La última previsión sigue visible (punto naranja en el indicador del dispositivo)
   y la integración vuelve a intentarlo cada 5 minutos.

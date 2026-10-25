@@ -14,7 +14,7 @@
 
 import { createLogger, WIDGET_COLORS } from '@gladysassistant/integration-sdk';
 import { deviceIds, FEATURES } from '../device.js';
-import { describeCoordinates } from '../location.js';
+import { describeCoordinates, pickedHouseProblem } from '../location.js';
 import { describeInstallation, formatKwh, formatWatts } from '../format.js';
 import { localize } from '../i18n.js';
 import { MissingLocationError } from '../forecastStore.js';
@@ -98,7 +98,12 @@ export function buildSolarWidget(app) {
     return {
       ttl_seconds: 60,
       components: [
-        { type: 'text', text: missing ? texts.noLocation : texts.noForecast },
+        {
+          type: 'text',
+          text: missing
+            ? (pickedHouseProblem(store.lastError) ?? texts.noLocation)
+            : texts.noForecast,
+        },
         refreshButton,
       ],
     };

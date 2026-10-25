@@ -175,6 +175,17 @@ test('no location: the status tells the user what to fill in', async () => {
   assert.match(message.fr, /position de votre maison/);
 });
 
+test('a picked house that no longer exists: the status says to pick another one', async () => {
+  const harness = createHarness({ config: { house: 'deleted-house' } });
+  await harness.gladys.connect();
+  assert.equal(harness.state.calls, 0, 'never replaced by another house');
+  const { connected, message } = harness.gladys.fake.connectionStatus;
+  assert.equal(connected, false);
+  assert.deepEqual(Object.keys(message), LANGUAGES);
+  assert.match(message.en, /no longer exists/);
+  assert.match(message.fr, /n'existe plus/);
+});
+
 test('"Test the forecast" answers with the figures, in every language', async () => {
   const harness = createHarness({ time: '08:00' });
   await harness.gladys.connect();
