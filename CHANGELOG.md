@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-10-25
+
 ### Added
 
 - **House** field: with several Gladys houses, pick the one where the panels are (empty: the
@@ -50,6 +52,7 @@ the notes of the version's GitHub Release.
 - CI (Prettier, ESLint, tests on Node 22 and 24, store checks, Docker build),
   UI-driven release workflow, GitHub Releases and Dependabot.
 
-[Unreleased]: https://github.com/prohand/gladys-openmeteoforecastsolar/compare/v0.0.2...HEAD
+[Unreleased]: https://github.com/prohand/gladys-openmeteoforecastsolar/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/prohand/gladys-openmeteoforecastsolar/compare/v0.0.2...v0.1.0
 [0.0.2]: https://github.com/prohand/gladys-openmeteoforecastsolar/compare/v0.0.1...v0.0.2
 [0.0.1]: https://github.com/prohand/gladys-openmeteoforecastsolar/releases/tag/v0.0.1
