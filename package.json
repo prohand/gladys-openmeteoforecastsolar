@@ -1,6 +1,6 @@
 {
   "name": "gladys-openmeteoforecastsolar",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "private": true,
   "description": "Gladys Assistant external integration: solar production forecast from the free Open-Meteo API.",
   "type": "module",
